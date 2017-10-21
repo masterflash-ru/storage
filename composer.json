@@ -1,0 +1,38 @@
+{
+    "name": "masterflash-ru/storage",
+    "description": "Сервис-библиотека для обработки файлов в хранилище",
+    "type": "Service",
+    "license": "BSD-3-Clause",
+    "keywords": [
+        "masterflash",
+        "zendframework"
+    ],
+    "homepage": "https://masterflash.ru/",
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "require": {
+        "php": "^7.0",
+        "zendframework/zend-cache": "^2.7",
+        "masterflash-ru/ado": "*"
+    },
+    "autoload": {
+        "psr-4": {
+            "Storage\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Storage\\": "src/"
+        }
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-master": "1.1-dev",
+            "dev-develop": "1.1-dev"
+        },
+        "zf": {
+            "component": "Storage",
+            "config-provider": "masterflash-ru\\Storage\\ConfigProvider"
+        }
+    }
+}
