@@ -5,8 +5,8 @@
 Установка
 composer require masterflash-ru/storage
 
-Библиотека предназначена для обработки файлов/графики, хранении ее в локальном файловом хранилище. 
-По требованию возвращается имя файла. В базе данных хранится только имя файла, причем для одного элемента может быть множество файлов с разными размерами.
+Библиотека предназначена для обработки графики, хранении ее в файловом хранилище. По требованию возвращается имя файла. В базе данных хранится только имя файла, причем для одного элемента может быть множество
+файлов с разными размерами.
 
 В базу вместе с именами файлов записывается номер версии библиотеки, для будущих расширений, что бы в существующих хранилищах не производить изменения.
 
@@ -15,13 +15,13 @@ composer require masterflash-ru/storage
 Конфигурация библиотеки описана ниже в примере, эту конфигурацию следует разместить в конфигурацию приложения:
 ```php
 ........
-    /*хранилище и обработка (ресайз) фото и других файлов*/
+    /*хранилище и обработка (ресайз) фото*/
     "storage"=>[
 
         /*хранит загруженные файлы, готовые для обработки
         это промедуточное хранение
         */
-        'data_folder'=>"data/datastorage",
+        'data_folder'=>"data/images",
 
         /*
         *Именованные хранилища фото в виде множества вложенных папок
@@ -36,17 +36,18 @@ composer require masterflash-ru/storage
 
         'items'=>[
             /*хранилище для ленты новостей, ключ это имя секции, которая используется для работы
-            он же является именем раздела, под которым записываются и считываются файлы*/
+            *он же является именем раздела, под которым записываются и считываются файлы*/
+            
             "news"=>[
                 "description"=>"Хранение фото новостей",
-                'file_storage'=>'default',
-                'file_rules'=>[
+                'file_storage'=>'default', /*имя хранилища*/
+                'images'=>[
                             'admin_img'=>[
                                 'filters'=>[
-                                        CopyToStorage::class => [
+                                        CopyToStorage::class => [   /*Наличе этого фильтра ОБЯЗАТЕЛЬНО!*/
                                                     'folder_level'=>1,
                                                     'folder_name_size'=>3,
-                                                    'strategy_new_name'=>'md5'
+                                                    'strategy_new_name'=>'translit' /*стратегия создания нового имени, none, md5, sha1, translit, uniqid*/
                                         ],
                                         ImgResize::class=>[
                                                     "method"=>1,
@@ -59,12 +60,12 @@ composer require masterflash-ru/storage
                                                     "optipng"=>3,
                                         ],
                                         Watermark::class=>[
-                                                    "waterimage"=>"data/datastorage/water2.png",
+                                                    "waterimage"=>"data/images/water2.png",
                                                     'adapter'=>'Consoleimagick',
                                         ],
     
                                 ],
-                                'validators' => [
+                                'validators' => [/*валидаторы достаточно применить для одной ветки, т.к. последующие ветки используют исходное изображание вновь*/
                                         IsImage::class=>[],
                                         ImageSize::class => [
                                             'minWidth' => 500,
@@ -97,16 +98,64 @@ composer require masterflash-ru/storage
 
 ```php
 use Images\Service\ImagesLib;
-/*получить экземпляр для обработки фото*/
+/*получить экземпляр*/
 $imglib=$container->get(ImagesLib::class);
 ```
 Запись в библиотеку:
 ```php
-/*
-$name - имя ключа конфига из 'items', в примере это, например, news
-метод перестраивает библиотеку на работу с этими правилами
-*/
-$ImgLib->selectStorageItem($name);
+/* содержимое из конфига, обычно считывается из items по имени массива изображений*/
+$arr=[
+                "description"=>"Хранение фото новостей",
+                'file_storage'=>'default',
+                'images'=>[
+                            'admin_img'=>[
+                                'filters'=>[
+                                        CopyToStorage::class => [
+                                                    'folder_level'=>1,
+                                                    'folder_name_size'=>3,
+                                        ],
+                                        ImgResize::class=>[
+                                                    "method"=>1,
+                                                    "width"=>150,
+                                                    "height"=>150,
+                                                    'adapter'=>Gd::class,
+                                        ],
+                                        ImgOptimize::class=>[
+                                                    "jpegoptim"=>85,
+                                                    "optipng"=>3,
+                                        ],
+                                        Watermark::class=>[
+                                                    "waterimage"=>"data/images/water2.png",
+                                                    'adapter'=>'Consoleimagick',
+                                        ],
+    
+                                ],
+                                'validators' => [
+                                        IsImage::class=>[],
+                                        ImageSize::class => [
+                                            'minWidth' => 500,
+                                            'minHeight' => 250,
+                                    ],
+                                ],
+                            ],
+                            'anons'=>[
+                                'filters'=>[
+                                        CopyToStorage::class => [
+                                                    'folder_level'=>1,
+                                                    'folder_name_size'=>3,
+                                        ],
+                                        ImgResize::class=>[
+                                                    "method"=>1,
+                                                    "width"=>500,
+                                                    "height"=>250,
+                                                    'adapter'=>'gd',
+                                        ],
+                                ],
+                            ],
+                ],
+
+    ];
+$ImgLib->setMediaInfo($arr);
 /*
 $filename - исходное имя файла, как правило в data/images,
 $razdel - имя раздела, например, news (обычно совпадает с именем массива фото, и равно ключу в имени конфига),
