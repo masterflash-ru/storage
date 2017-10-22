@@ -132,13 +132,67 @@ public function saveFiles($filename,$razdel,$razdel_id)
 
 
 /*
-получить путь к файлу
+получить путь к файлу+ сам файл
 $razdel - имя раздела, например, news,
 $razdel_id - ID элемента, например ID новости,
 $item_name - имя фотоэлемента, например, admin_img или anons
 возвращает полный URL путь с файлом, готовые для вставки в тег <img....
 */
 public function loadFile($razdel,$razdel_id,$item_name)
+{
+    $rez=$this->loadFilesArray($razdel,$razdel_id);
+    /*получить само хранилище по имени*/
+    if (!empty($rez['file_storage'])) {
+            $file_storage_name=$rez['file_storage'];
+        } else {
+            $file_storage_name="default";
+        }
+        
+    $base_url=$this->config['file_storage'][$file_storage_name]['base_url'];
+	if (isset($rez[$item_name])) {return $base_url.$rez[$item_name];}
+	return "";
+}
+
+/*
+получить путь к файлам+ сами файлы - МАССИВ! 
+$razdel - имя раздела, например, news,
+$razdel_id - ID элемента, например ID новости,
+$item_name - имя фотоэлемента, например, admin_img или anons
+возвращает полный URL путь с файлом, готовые для вставки в тег <img....
+*/
+public function loadFiles($razdel,$razdel_id)
+{
+    $rez=$this->loadFilesArray($razdel,$razdel_id);
+    /*получить само хранилище по имени*/
+    if (!empty($rez['file_storage'])) {
+            $file_storage_name=$rez['file_storage'];
+        } else {
+            $file_storage_name="default";
+        }
+    /*получить само хранилище по имени*/
+        if (!empty($rez['file_storage'])) {
+            $file_storage_name=$rez['file_storage'];
+        } else {
+            $file_storage_name="default";
+        }
+    $base_url=$this->config['file_storage'][$file_storage_name]['base_url'];
+    unset($rez['file_storage']);
+    $ret=[];
+    foreach ($rez as $i){
+        $ret[]=$base_url.$i;
+    }
+    return $ret;
+}
+
+    
+/*
+получить путь к файлу+ сам файл для всех элементов в виде массива
+$razdel - имя раздела, например, news,
+$razdel_id - ID элемента, например ID новости,
+$item_name - имя фотоэлемента, например, admin_img или anons
+возвращает полный URL путь с файлом, готовые для вставки в тег <img....
+*/
+public function loadFilesArray($razdel,$razdel_id)
 {
 	 $result = false;
 	 $key="storage_lib_".preg_replace('/[^0-9a-zA-Z_\-]/iu', '',$razdel)."_{$razdel_id}";
@@ -156,16 +210,7 @@ public function loadFile($razdel,$razdel_id,$item_name)
 					if (!empty($rez)) {$this->cache->setItem($key, $rez);}
 				}
 		}
-        /*получить само хранилище по имени*/
-        if (!empty($rez['file_storage'])) {
-            $file_storage_name=$rez['file_storage'];
-        } else {
-            $file_storage_name="default";
-        }
-        
-    $base_url=$this->config['file_storage'][$file_storage_name]['base_url'];
-	if (isset($rez[$item_name])) {return $base_url.$rez[$item_name];}
-	return "";
+    return $rez;    
 }
 
 
