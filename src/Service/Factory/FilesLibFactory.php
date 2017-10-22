@@ -2,14 +2,13 @@
 namespace Storage\Service\Factory;
 
 use Interop\Container\ContainerInterface;
-use Storage\Service\ImagesLib;
 
 /*
 Фабрика 
-генерации сервиса обработки фото и записи/возврата в хранилище
+генерации сервиса обработки файлов/фото и записи/возврата в хранилище
 */
 
-class ImagesLibFactory
+class FilesLibFactory
 {
 
 public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
@@ -22,7 +21,7 @@ public function __invoke(ContainerInterface $container, $requestedName, array $o
 			$config=$config["storage"];
 		}
 		else {throw new \Exception("Нет секции 'storage' в конфиге приложения");}
-        return new ImagesLib($connection,$config,$cache);
+        return new $requestedName($connection,$config,$cache);
     }
 }
 

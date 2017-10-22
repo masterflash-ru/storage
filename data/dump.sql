@@ -15,18 +15,17 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
-DROP TABLE IF EXISTS `img_lib`;
+DROP TABLE IF EXISTS `storage`;
 
-REATE TABLE `img_lib` (
+CREATE TABLE `storage` (
   `id` int(11) unsigned NOT NULL,
   `razdel` char(50) NOT NULL COMMENT 'раздел, например, news',
   `todelete` int(11) DEFAULT '0' COMMENT 'флаг что нужно удалить эти фото',
-  `img_array` text COMMENT 'структура serialize массива размеры-файлы',
-  `version` int(11) DEFAULT NULL COMMENT 'версия хранилища',
+  `file_array` text COMMENT 'структура serialize массива имен файлов',
+  `version` float(9,1) DEFAULT NULL COMMENT 'версия хранилища',
   PRIMARY KEY (`id`,`razdel`),
   KEY `todelete` (`todelete`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 COMMENT='фото всех разделов';
-
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COMMENT='Хранилище файлов';
 --
 -- Dumping routines for database 'simba4'
 --

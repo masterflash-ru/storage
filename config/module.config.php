@@ -9,7 +9,7 @@ namespace Storage;
 return [
     'service_manager' => [
         'factories' => [//сервисы-фабрики
-            Service\ImagesLib::class => Service\Factory\ImagesLibFactory::class,
+            Service\ImagesLib::class => Service\Factory\FilesLibFactory::class,
         ],
     ],
 
