@@ -41,7 +41,7 @@ composer require masterflash-ru/storage
             "news"=>[
                 "description"=>"Хранение фото новостей",
                 'file_storage'=>'default', /*имя хранилища*/
-                'images'=>[
+                'file_rules'=>[
                             'admin_img'=>[
                                 'filters'=>[
                                         CopyToStorage::class => [   /*Наличе этого фильтра ОБЯЗАТЕЛЬНО!*/

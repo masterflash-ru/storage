@@ -23,8 +23,8 @@ class Consoleimagick extends ImgAbstract
 		
 		$imgsize=explode("x",shell_exec($this->_options['imagemagick_console_path']."identify -format \"%[fx:w]x%[fx:h]\"  '$value'"));
 
-		$sourceWidth =$imgsize[0];
-		$sourceHeight = $imgsize[1];
+		$sourceWidth =(int)$imgsize[0];
+		$sourceHeight = (int)$imgsize[1];
 
 		if ($sourceWidth <= $this->_options['width'] && $sourceHeight <= $this->_options['height']) 
 		{
