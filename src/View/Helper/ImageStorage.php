@@ -3,7 +3,7 @@
 помощник view для вывода из хранилища фото имени файла фото, готового для вставки в HTML
 */
 
-namespace Storage\View\Helper;
+namespace Mf\Storage\View\Helper;
 
 use Zend\View\Helper\AbstractHelper;
 

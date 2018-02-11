@@ -1,9 +1,9 @@
 <?php
-namespace Storage\View\Helper\Factory;
+namespace Mf\Storage\View\Helper\Factory;
 
 use Interop\Container\ContainerInterface;
 use Zend\ServiceManager\Factory\FactoryInterface;
-use Storage\Service\FilesLib;
+use Mf\Storage\Service\FilesLib;
 
 /**
  * универсальная фабрика для помощника

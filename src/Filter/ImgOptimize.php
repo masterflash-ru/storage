@@ -2,7 +2,7 @@
 /**
 Ресайз изображений разными графическими библиотеками
  */
-namespace Storage\Filter;
+namespace Mf\Storage\Filter;
 
 use Zend\Filter\FilterInterface;
 use Exception;

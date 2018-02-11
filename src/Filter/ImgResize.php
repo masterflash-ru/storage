@@ -2,18 +2,18 @@
 /**
 Ресайз изображений разными графическими библиотеками
  */
-namespace Storage\Filter;
+namespace Mf\Storage\Filter;
 
 use Zend\Filter\FilterInterface;
 use Exception;
-use Storage\Filter\Service\ImgAbstract;
+use Mf\Storage\Filter\Service\ImgAbstract;
 
 class ImgResize  implements FilterInterface
 {
         protected static $classMap = [
-        'gd'                => 'Storage\Filter\Service\Gd',
-        'imagick'           => 'Storage\Filter\Service\Imagick',
-        'consoleimagick'    => 'Storage\Filter\Service\Consoleimagick',
+        'gd'                => 'Mf\Storage\Filter\Service\Gd',
+        'imagick'           => 'Mf\Storage\Filter\Service\Imagick',
+        'consoleimagick'    => 'Mf\Storage\Filter\Service\Consoleimagick',
         ];
 
 /**

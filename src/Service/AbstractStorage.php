@@ -1,5 +1,5 @@
 <?php
-namespace Storage\Service;
+namespace Mf\Storage\Service;
 
 use Exception;
 use ADO\Service\RecordSet;

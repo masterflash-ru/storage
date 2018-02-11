@@ -1,5 +1,5 @@
 <?php
-namespace Storage\Service\Factory;
+namespace Mf\Storage\Service\Factory;
 
 use Interop\Container\ContainerInterface;
 

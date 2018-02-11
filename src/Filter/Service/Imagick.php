@@ -2,7 +2,7 @@
 /*
 Адаптер работы с графикой через расширение Imagick
 */
-namespace Storage\Filter\Service;
+namespace Mf\Storage\Filter\Service;
 use Exception;
 
 

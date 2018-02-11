@@ -17,12 +17,12 @@
     },
     "autoload": {
         "psr-4": {
-            "Storage\\": "src/"
+            "Mf\\Storage\\": "src/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "Storage\\": "src/"
+            "Mf\\Storage\\": "src/"
         }
     },
     "extra": {
@@ -31,8 +31,8 @@
             "dev-develop": "1.1-dev"
         },
         "zf": {
-            "component": "Storage",
-            "config-provider": "masterflash-ru\\Storage\\ConfigProvider"
+            "component": "Mf\\Storage",
+            "config-provider": "masterflash-ru\\Mf\\Storage\\ConfigProvider"
         }
     }
 }

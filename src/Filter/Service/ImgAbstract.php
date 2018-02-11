@@ -3,7 +3,7 @@
 Абстрактный адаптер
 */
 
-namespace Storage\Filter\Service;
+namespace Mf\Storage\Filter\Service;
 use Exception;
 
 abstract class ImgAbstract

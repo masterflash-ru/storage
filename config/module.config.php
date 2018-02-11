@@ -3,7 +3,7 @@
 библиотека работы с изображениями
  */
 
-namespace Storage;
+namespace Mf\Storage;
 
 
 return [

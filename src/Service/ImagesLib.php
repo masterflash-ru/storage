@@ -1,5 +1,5 @@
 <?php
-namespace Storage\Service;
+namespace Mf\Storage\Service;
 
 /*
 сервис обработки фото и хранения

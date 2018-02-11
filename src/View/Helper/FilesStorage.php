@@ -4,7 +4,7 @@
 возвращается МАССИВ!!!!!!!
 */
 
-namespace Storage\View\Helper;
+namespace Mf\Storage\View\Helper;
 
 use Zend\View\Helper\AbstractHelper;
 
