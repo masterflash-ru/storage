@@ -4,7 +4,7 @@
 */
 namespace Mf\Storage\Filter\Service;
 use Exception;
-
+use Imagick as PhpImagick;
 
 class Imagick extends ImgAbstract
 {
@@ -20,7 +20,7 @@ class Imagick extends ImgAbstract
 	public function resize($value)
 	{
 		$content=$this->readImg($value);
-		$Imagick=new Imagick();
+		$Imagick=new PhpImagick();
 		if (!$Imagick->readImageBlob($content)) 
 		{
 			throw new Exception("Ошибка чтения файла $value");
@@ -71,7 +71,27 @@ class Imagick extends ImgAbstract
 		return $value;
 	}
 	
-	
+public function watermark($value)
+{
+	if ($this->_options['waterimage'])
+	{
+        $w=getcwd().DIRECTORY_SEPARATOR.$this->_options['waterimage'];
+        $overlay = new PhpImagick($w);
+        
+        $image = new PhpImagick($value);
+$geo=$image->getImageGeometry(); 
+        $image->setImageColorspace($overlay->getImageColorspace() ); 
+        $image->compositeImage($overlay, PhpImagick::COMPOSITE_DEFAULT, $geo['width']-250, $geo['height']-120);
+        $image->writeImage($value); //replace original background
+
+        $overlay->destroy();
+        $image->destroy();
+		
+     	//shell_exec ($this->_options['imagemagick_console_path']."composite -dissolve 100 -tile $w '$value' '$value'");
+	}
+
+}
+
 	
 }
 ?>
