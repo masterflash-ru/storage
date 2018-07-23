@@ -79,9 +79,12 @@ public function watermark($value)
         $overlay = new PhpImagick($w);
         
         $image = new PhpImagick($value);
-$geo=$image->getImageGeometry(); 
+        $geo=$image->getImageGeometry(); 
+        
+        $geo_overlay=$overlay->getImageGeometry(); 
+       
         $image->setImageColorspace($overlay->getImageColorspace() ); 
-        $image->compositeImage($overlay, PhpImagick::COMPOSITE_DEFAULT, $geo['width']-250, $geo['height']-120);
+        $image->compositeImage($overlay, PhpImagick::COMPOSITE_DEFAULT, $geo['width']-$geo_overlay['width']-20, $geo['height']-$geo_overlay['height']-20);
         $image->writeImage($value); //replace original background
 
         $overlay->destroy();
