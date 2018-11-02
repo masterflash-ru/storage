@@ -63,6 +63,7 @@ $razdel_id - уникальный номер записи, обычно ID за�
 */
 public function saveFiles($filename,$razdel,$razdel_id)
 {
+    $razdel_id=(int)$razdel_id;
 	$rez=[];
 	$size_info=$this->media['file_rules'];
 	foreach ($size_info as $size_name=>$size_info){

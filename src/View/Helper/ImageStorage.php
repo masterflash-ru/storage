@@ -26,8 +26,8 @@ public function __invoke($razdel,$razdel_id,$item_name,$default_image=NULL)
 
 
 public function __construct ($ImagesLib)
-	{
-		$this->ImagesLib=$ImagesLib;
-	}
+{
+	$this->ImagesLib=$ImagesLib;
+}
 
 }
