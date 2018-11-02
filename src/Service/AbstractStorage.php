@@ -65,42 +65,40 @@ public function saveFiles($filename,$razdel,$razdel_id)
 {
 	$rez=[];
 	$size_info=$this->media['file_rules'];
-	foreach ($size_info as $size_name=>$size_info)
-		{
-			/*смотрим валидаторы и применяем ДО обработки фильтрами*/
-			if (!empty($size_info["validators"]) && is_array($size_info["validators"])){
-                //чтение фильтров и применение их
-                $vChain = new ValidatorChain();
-                
-                foreach ($size_info["validators"] as $validator=>$options){;
+	foreach ($size_info as $size_name=>$size_info){
+        /*смотрим валидаторы и применяем ДО обработки фильтрами*/
+        if (!empty($size_info["validators"]) && is_array($size_info["validators"])){
+            //чтение фильтров и применение их
+            $vChain = new ValidatorChain();
+            foreach ($size_info["validators"] as $validator=>$options){
                 $vChain->attachByName($validator,$options);
-                }
-                
-                if (!$vChain->isValid($this->source_folder.$filename)){
-                    foreach ($vChain->getMessages() as $message) {
-                        echo "<b>$message\n</b><br>";
-                    }
-                    return;
-                }
-
             }
-            $rez[$size_name]='';
-
-            $filterChain = new FilterChain();
-
-			if (!empty($size_info["filters"]) && is_array($size_info["filters"])){
-                //чтение фильтров и применение их
                 
-                foreach ($size_info["filters"] as $filter=>$options){
-                    $options['target_folder']=$this->base_public_path;
-                    $filterChain->attachByName($filter,$options);
+            if (!$vChain->isValid($this->source_folder.$filename)){
+                foreach ($vChain->getMessages() as $message) {
+                    echo "<b>$message\n</b><br>";
                 }
-                
-                $new=$filterChain->filter($this->source_folder.$filename);
-                //удалим базовый путь, что бы выделить разбитое имя
-                $rez[$size_name]=str_replace($this->base_public_path,'',$new);
+                return;
             }
-		}
+            
+        }
+        $rez[$size_name]='';
+
+        $filterChain = new FilterChain();
+
+		if (!empty($size_info["filters"]) && is_array($size_info["filters"])){
+            //чтение фильтров и применение их
+            
+            foreach ($size_info["filters"] as $filter=>$options){
+                $options['target_folder']=$this->base_public_path;
+                $filterChain->attachByName($filter,$options);
+            }
+                
+            $new=$filterChain->filter($this->source_folder.$filename);
+            //удалим базовый путь, что бы выделить разбитое имя
+            $rez[$size_name]=str_replace($this->base_public_path,'',$new);
+        }
+    }
         
     $rez['file_storage']=$this->media['file_storage'];
 
@@ -115,7 +113,7 @@ public function saveFiles($filename,$razdel,$razdel_id)
         $rs->Fields->Item["id"]->Value=$razdel_id;
         $rs->Fields->Item["todelete"]->Value=0;
         $rs->Fields->Item["version"]->Value=self::VERSION;
-    }else  {
+    } else  {
         //удалим старые файлы
         $del=unserialize($rs->Fields->Item["file_array"]->Value);
         $this->delItem($del);
@@ -194,22 +192,20 @@ $item_name - имя фотоэлемента, например, admin_img или
 */
 public function loadFilesArray($razdel,$razdel_id)
 {
+    $razdel_id=(int)$razdel_id;
 	 $result = false;
 	 $key="storage_lib_".preg_replace('/[^0-9a-zA-Z_\-]/iu', '',$razdel)."_{$razdel_id}";
 
      $rez = $this->cache->getItem($key, $result);
-     if (!$result)
-        {
-			$rez=[];
-			$rs=new RecordSet();
-			$rs->CursorType = adOpenKeyset;
-			$rs->open("SELECT * FROM storage where id=".$razdel_id." and razdel='{$razdel}'",$this->connection);
-			if (!$rs->EOF)
-				{
-					$rez=unserialize($rs->Fields->Item["file_array"]->Value);
-					if (!empty($rez)) {$this->cache->setItem($key, $rez);}
-				}
-		}
+     if (!$result){
+         $rez=[];
+         $rs=new RecordSet();
+         $rs->open("SELECT * FROM storage where id=".$razdel_id." and razdel='{$razdel}'",$this->connection);
+         if (!$rs->EOF){
+             $rez=unserialize($rs->Fields->Item["file_array"]->Value);
+             if (!empty($rez)) {$this->cache->setItem($key, $rez);}
+         }
+     }
     return $rez;    
 }
 
@@ -225,14 +221,13 @@ public function deleteFile($razdel,$razdel_id)
 	$rs=new RecordSet();
 	$rs->CursorType = adOpenKeyset;
 	$rs->open("SELECT * FROM storage where id=".$razdel_id." and razdel='{$razdel}' or todelete>0",$this->connection);
-	while(!$rs->EOF)
-		{
-			$del=unserialize($rs->Fields->Item["file_array"]->Value);
-            $this->delItem($del);
-			$rs->Delete();
-			$rs->Update();
-			$rs->MoveNext();
-		}
+	while(!$rs->EOF){
+        $del=unserialize($rs->Fields->Item["file_array"]->Value);
+        $this->delItem($del);
+        $rs->Delete();
+        $rs->Update();
+        $rs->MoveNext();
+    }
 	$this->deleteEmptyDir();
 	$razdel=preg_replace('/[^0-9a-zA-Z_\-]/iu', '',$razdel);
 	$this->cache->removeItem("storage_lib_{$razdel}_{$razdel_id}");
@@ -251,8 +246,7 @@ protected function deleteEmptyDir()
             DIRECTORY_SEPARATOR .
             $storage_item ["base_url"],DIRECTORY_SEPARATOR
             );
-        try
-        {
+        try {
             $idir = new \RecursiveIteratorIterator( new \RecursiveDirectoryIterator( $base_public_path, \FilesystemIterator::SKIP_DOTS ), \RecursiveIteratorIterator::CHILD_FIRST );
         }
         catch (\UnexpectedValueException $e) { return;}
@@ -265,7 +259,6 @@ protected function deleteEmptyDir()
                 }
             }
         } 
-
     }
 }
 
