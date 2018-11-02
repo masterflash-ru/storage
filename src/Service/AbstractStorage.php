@@ -204,7 +204,10 @@ public function loadFilesArray($razdel,$razdel_id)
          $rs->open("SELECT * FROM storage where id=".$razdel_id." and razdel='{$razdel}'",$this->connection);
          if (!$rs->EOF){
              $rez=unserialize($rs->Fields->Item["file_array"]->Value);
-             if (!empty($rez)) {$this->cache->setItem($key, $rez);}
+             if (!empty($rez)) {
+                 $this->cache->setItem($key, $rez);
+                 $this->cache->setTags($key,[$razdel]);
+             }
          }
      }
     return $rez;    
@@ -220,7 +223,6 @@ public function deleteFile($razdel,$razdel_id)
 {
 	$razdel_id=(int)$razdel_id;
 	$rs=new RecordSet();
-	$rs->CursorType = adOpenKeyset;
 	$rs->open("SELECT * FROM storage where id=".$razdel_id." and razdel='{$razdel}' or todelete>0",$this->connection);
 	while(!$rs->EOF){
         $del=unserialize($rs->Fields->Item["file_array"]->Value);
@@ -232,6 +234,26 @@ public function deleteFile($razdel,$razdel_id)
 	$this->deleteEmptyDir();
 	$razdel=preg_replace('/[^0-9a-zA-Z_\-]/iu', '',$razdel);
 	$this->cache->removeItem("storage_lib_{$razdel}_{$razdel_id}");
+}
+
+/*
+удалить массив файлов всего раздела
+$razdel - имя раздела, например, news,
+*/
+public function deleteFileRazdel($razdel)
+{
+    $razdel=preg_replace('/[^0-9a-zA-Z_\-]/iu', '',$razdel);
+	$rs=new RecordSet();
+	$rs->open("SELECT * FROM storage where razdel='{$razdel}' or todelete>0",$this->connection);
+	while(!$rs->EOF){
+        $del=unserialize($rs->Fields->Item["file_array"]->Value);
+        $this->delItem($del);
+        $rs->Delete();
+        $rs->Update();
+        $rs->MoveNext();
+    }
+	$this->deleteEmptyDir();
+    $this->cache->clearByTags([$razdel],true);
 }
 
 
