@@ -223,6 +223,7 @@ public function deleteFile($razdel,$razdel_id)
 {
 	$razdel_id=(int)$razdel_id;
 	$rs=new RecordSet();
+    $rs->CursorType = adOpenKeyset;
 	$rs->open("SELECT * FROM storage where id=".$razdel_id." and razdel='{$razdel}' or todelete>0",$this->connection);
 	while(!$rs->EOF){
         $del=unserialize($rs->Fields->Item["file_array"]->Value);
@@ -244,6 +245,7 @@ public function deleteFileRazdel($razdel)
 {
     $razdel=preg_replace('/[^0-9a-zA-Z_\-]/iu', '',$razdel);
 	$rs=new RecordSet();
+    $rs->CursorType = adOpenKeyset;
 	$rs->open("SELECT * FROM storage where razdel='{$razdel}' or todelete>0",$this->connection);
 	while(!$rs->EOF){
         $del=unserialize($rs->Fields->Item["file_array"]->Value);
@@ -256,6 +258,22 @@ public function deleteFileRazdel($razdel)
     $this->cache->clearByTags([$razdel],true);
 }
 
+
+/*
+*сервисные, получить путь к исходным файлам
+*/
+public function getSourceFolder()
+{
+    return $this->source_folder;
+}
+
+/*
+* сервисные, установить папку в которой исходыне файлы
+*/
+public function setSourceFolder($path)
+{
+    $this->source_folder=$path;
+}
 
 /*
 обход каталогов хранилища и удаление пустых каталогов

@@ -95,68 +95,23 @@ composer require masterflash-ru/storage
 .......
 ```
 
-
 ```php
+/*объект ImagesLib регистрируется в менеджере, его можно извлечь в фабриках, если нужна обработка*/
 use Images\Service\ImagesLib;
+
 /*получить экземпляр*/
 $imglib=$container->get(ImagesLib::class);
 ```
 Запись в библиотеку:
 ```php
-/* содержимое из конфига, обычно считывается из items по имени массива изображений*/
-$arr=[
-                "description"=>"Хранение фото новостей",
-                'file_storage'=>'default',
-                'images'=>[
-                            'admin_img'=>[
-                                'filters'=>[
-                                        CopyToStorage::class => [
-                                                    'folder_level'=>1,
-                                                    'folder_name_size'=>3,
-                                        ],
-                                        ImgResize::class=>[
-                                                    "method"=>1,
-                                                    "width"=>150,
-                                                    "height"=>150,
-                                                    'adapter'=>Gd::class,
-                                        ],
-                                        ImgOptimize::class=>[
-                                                    "jpegoptim"=>85,
-                                                    "optipng"=>3,
-                                        ],
-                                        Watermark::class=>[
-                                                    "waterimage"=>"data/images/water2.png",
-                                                    'adapter'=>'Consoleimagick',
-                                        ],
-    
-                                ],
-                                'validators' => [
-                                        IsImage::class=>[],
-                                        ImageSize::class => [
-                                            'minWidth' => 500,
-                                            'minHeight' => 250,
-                                    ],
-                                ],
-                            ],
-                            'anons'=>[
-                                'filters'=>[
-                                        CopyToStorage::class => [
-                                                    'folder_level'=>1,
-                                                    'folder_name_size'=>3,
-                                        ],
-                                        ImgResize::class=>[
-                                                    "method"=>1,
-                                                    "width"=>500,
-                                                    "height"=>250,
-                                                    'adapter'=>'gd',
-                                        ],
-                                ],
-                            ],
-                ],
-
-    ];
-$ImgLib->setMediaInfo($arr);
 /*
+вначале нужно выбрать секцию из конфига, в которой указаны правила обработки фото (куда писать, и как уменьшать)
+$name - имя секции конфига с правилами обработки файлов, из примера выше это "news"
+*/
+$ImgLib->selectStorageItem($name);
+
+/*
+далее нужно передать исходный файл в виде пути и имени, имя раздела и идентификатор записи раздела
 $filename - исходное имя файла, как правило в data/images,
 $razdel - имя раздела, например, news (обычно совпадает с именем массива фото, и равно ключу в имени конфига),
 $razdel_id - внутренний идентификатор элемента, например, ID новости в ленте
@@ -187,8 +142,6 @@ $ImgLib->deleteFile($razdel_name,$id);
 //$razdel_name - имя раздела
 $ImgLib->deleteFileRazdel($razdel_name);
 ```
-
-
 
 Библиотека регистрирует помощник для view, при помощи которого можно получить сразу имя файла и путь, готовых для тега <img>
 По сути помощник вызывает loadImage с этим же параметрами, дополнительно обрабатывает помощником basePath фреймворка

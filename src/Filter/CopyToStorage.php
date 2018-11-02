@@ -46,7 +46,7 @@ public function filter($value)
 	$path=dirname( $target.$newfilename);
 	if (!is_dir($path)) {mkdir($path,0777,true);}
 
-    
+
 	if (!copy($value,$target.$newfilename)) {
             throw new Exception("Не удается скопировать файл из {$value}, в {$target}");
     }
