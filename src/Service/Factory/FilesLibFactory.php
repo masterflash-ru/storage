@@ -13,7 +13,7 @@ class FilesLibFactory
 
 public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {
-		$connection=$container->get('ADO\Connection');
+		$connection=$container->get('DefaultSystemDb');
        $config=$container->get("config");
 	   $cache = $container->get('DefaultSystemCache');
 	   if (!empty($config["storage"])) 
