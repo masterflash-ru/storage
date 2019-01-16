@@ -148,3 +148,26 @@ $ImgLib->deleteFileRazdel($razdel_name);
 ```html
 <img src="<?=$this->ImageStorage($stream_name,$id,$item_name);?>" />
 ```
+
+В конфиге приложения должны быть настройки кэша:
+```php
+
+    'caches' => [
+        'DefaultSystemCache' => [
+            'adapter' => [
+                'name'    => Filesystem::class,
+                'options' => [
+                    'cache_dir' => './data/cache',
+                    'ttl' => 60*60*2 
+                ],
+            ],
+            'plugins' => [
+                [
+                    'name' => Serializer::class,
+                    'options' => [
+                    ],
+                ],
+            ],
+        ],
+    ],
+```
