@@ -66,6 +66,7 @@ public function saveFiles($filename,$razdel,$razdel_id)
     $razdel_id=(int)$razdel_id;
 	$rez=[];
 	$size_info=$this->media['file_rules'];
+    /*цикл по параметрам секции file_rules выбранного раздела из storage*/
 	foreach ($size_info as $size_name=>$size_info){
         /*смотрим валидаторы и применяем ДО обработки фильтрами*/
         if (!empty($size_info["validators"]) && is_array($size_info["validators"])){
@@ -77,7 +78,7 @@ public function saveFiles($filename,$razdel,$razdel_id)
                 
             if (!$vChain->isValid($this->source_folder.$filename)){
                 foreach ($vChain->getMessages() as $message) {
-                    echo "<b>$message\n</b><br>";
+                    trigger_error($message, E_USER_WARNING);
                 }
                 return;
             }
@@ -100,7 +101,7 @@ public function saveFiles($filename,$razdel,$razdel_id)
             $rez[$size_name]=str_replace($this->base_public_path,'',$new);
         }
     }
-        
+
     $rez['file_storage']=$this->media['file_storage'];
 
 	//запишем в базу результат
