@@ -4,8 +4,6 @@
  */
 
 namespace Mf\Storage;
-use Zend\Cache\Storage\Plugin\Serializer;
-use Zend\Cache\Storage\Adapter\Filesystem;
 
 
 return [

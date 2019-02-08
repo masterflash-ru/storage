@@ -13,8 +13,7 @@
     "require": {
         "php": "^7.0",
         "zendframework/zend-cache": "^2.7",
-        "masterflash-ru/ado": "^2.0",
-        "masterflash-ru/stdlib": "*"
+        "masterflash-ru/ado": "^2.0"
     },
     "autoload": {
         "psr-4": {
