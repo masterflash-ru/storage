@@ -95,7 +95,7 @@ public function saveFiles($filename,$razdel,$razdel_id)
                 $options['target_folder']=$this->base_public_path;
                 $filterChain->attachByName($filter,$options);
             }
-                
+
             $new=$filterChain->filter($this->source_folder.$filename);
             //удалим базовый путь, что бы выделить разбитое имя
             foreach ($new as $k=>$item){
