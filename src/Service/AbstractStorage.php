@@ -13,7 +13,7 @@ use Zend\Filter\FilterChain;
 
 abstract class AbstractStorage 
 {
-    const VERSION=1;
+    const VERSION=2;
 	protected $config;
 	protected $connection;
 	protected $base_public_path;
@@ -98,12 +98,14 @@ public function saveFiles($filename,$razdel,$razdel_id)
                 
             $new=$filterChain->filter($this->source_folder.$filename);
             //удалим базовый путь, что бы выделить разбитое имя
-            $rez[$size_name]=str_replace($this->base_public_path,'',$new);
+            foreach ($new as $k=>$item){
+                $new[$k]=str_replace($this->base_public_path,'',$new[$k]);
+            }
+            $rez[$size_name]=$new;
         }
     }
 
     $rez['file_storage']=$this->media['file_storage'];
-
 	//запишем в базу результат
 	$rs=new RecordSet();
 	$rs->CursorType = adOpenKeyset;
@@ -114,15 +116,15 @@ public function saveFiles($filename,$razdel,$razdel_id)
         $rs->Fields->Item["razdel"]->Value=$razdel;
         $rs->Fields->Item["id"]->Value=$razdel_id;
         $rs->Fields->Item["todelete"]->Value=0;
-        $rs->Fields->Item["version"]->Value=self::VERSION;
     } else  {
         //удалим старые файлы
         $del=unserialize($rs->Fields->Item["file_array"]->Value);
-        $this->delItem($del);
+        $this->delItem($del,$rs->Fields->Item["version"]->Value);
         //чистим кеш
         $razdel=preg_replace('/[^0-9a-zA-Z_\-]/iu', '',$razdel);
         $this->cache->removeItem("storage_lib_{$razdel}_".$razdel_id);
 	}
+    $rs->Fields->Item["version"]->Value=static::VERSION;
     $rs->Fields->Item["file_array"]->Value=serialize($rez);
     $rs->Update();
     //удалим исходный фал
@@ -143,13 +145,22 @@ public function loadFile($razdel,$razdel_id,$item_name)
     $rez=$this->loadFilesArray($razdel,$razdel_id);
     /*получить само хранилище по имени*/
     if (!empty($rez['file_storage'])) {
-            $file_storage_name=$rez['file_storage'];
-        } else {
-            $file_storage_name="default";
-        }
-        
+        $file_storage_name=$rez['file_storage'];
+    } else {
+        $file_storage_name="default";
+    }
+    /**
+    * возвращаем данные для версии 1
+    */
     $base_url=$this->config['file_storage'][$file_storage_name]['base_url'];
-	if (isset($rez[$item_name])) {return $base_url.$rez[$item_name];}
+    
+    if (isset($rez[$item_name]) && $rez["version"]==1) {
+        return $base_url.$rez[$item_name];
+    }
+    if (isset($rez[$item_name]["default"])&& $rez["version"]==2) {
+        return $base_url.$rez[$item_name]["default"];
+    }
+    
 	return "";
 }
 
@@ -165,22 +176,36 @@ public function loadFiles($razdel,$razdel_id)
     $rez=$this->loadFilesArray($razdel,$razdel_id);
     /*получить само хранилище по имени*/
     if (!empty($rez['file_storage'])) {
-            $file_storage_name=$rez['file_storage'];
-        } else {
-            $file_storage_name="default";
-        }
-    /*получить само хранилище по имени*/
-        if (!empty($rez['file_storage'])) {
-            $file_storage_name=$rez['file_storage'];
-        } else {
-            $file_storage_name="default";
-        }
+        $file_storage_name=$rez['file_storage'];
+    } else {
+        $file_storage_name="default";
+    }
+    if (empty($rez["version"])){
+        return [];
+    } 
+    $version=$rez["version"]; //версия записи
     $base_url=$this->config['file_storage'][$file_storage_name]['base_url'];
     unset($rez['file_storage']);
+    unset($rez["version"]);
     $ret=[];
-    foreach ($rez as $i){
-        $ret[]=$base_url.$i;
+    switch ($version){
+        case 1:{
+            foreach ($rez as $k=>$i){
+                $ret[$k]=$base_url.$i;
+            }
+            break;
+        }
+        case 2:{
+            foreach ($rez as $item){
+                foreach ($item as $k=>$i){
+                    $ret[$k]=$base_url.$i;
+                }
+            }
+            break;
+        }
     }
+
+    
     return $ret;
 }
 
@@ -205,6 +230,7 @@ public function loadFilesArray($razdel,$razdel_id)
          $rs->open("SELECT * FROM storage where id=".$razdel_id." and razdel='{$razdel}'",$this->connection);
          if (!$rs->EOF){
              $rez=unserialize($rs->Fields->Item["file_array"]->Value);
+             $rez["version"]=(float)$rs->Fields->Item["version"]->Value;
              if (!empty($rez)) {
                  $this->cache->setItem($key, $rez);
                  $this->cache->setTags($key,[$razdel]);
@@ -228,7 +254,7 @@ public function deleteFile($razdel,$razdel_id)
 	$rs->open("SELECT * FROM storage where id=".$razdel_id." and razdel='{$razdel}' or todelete>0",$this->connection);
 	while(!$rs->EOF){
         $del=unserialize($rs->Fields->Item["file_array"]->Value);
-        $this->delItem($del);
+        $this->delItem($del,$rs->Fields->Item["version"]->Value);
         $rs->Delete();
         $rs->Update();
         $rs->MoveNext();
@@ -250,7 +276,7 @@ public function deleteFileRazdel($razdel)
 	$rs->open("SELECT * FROM storage where razdel='{$razdel}' or todelete>0",$this->connection);
 	while(!$rs->EOF){
         $del=unserialize($rs->Fields->Item["file_array"]->Value);
-        $this->delItem($del);
+        $this->delItem($del,$rs->Fields->Item["version"]->Value);
         $rs->Delete();
         $rs->Update();
         $rs->MoveNext();
@@ -307,7 +333,7 @@ protected function deleteEmptyDir()
 /*
 вспомогательная удаление файлов согласно описания 
 */
-protected function delItem($del)
+protected function delItem($del,$version=1)
 {
 /*получить само хранилище по имени*/
     if (!empty($del['file_storage'])) {
@@ -323,8 +349,22 @@ protected function delItem($del)
                         ).DIRECTORY_SEPARATOR;
     unset($del['file_storage']);
     unset($del['version']);
-    foreach ($del as $item){
-        unlink ($base_url.$item);
+    //удаление для формата версии 1
+    switch ($version){
+        case 1:{
+            foreach ($del as $item){
+                unlink ($base_url.$item);
+            }
+            break;
+        }
+        case 2:{
+            foreach ($del as $item){
+                foreach ($item as $i){
+                    unlink ($base_url.$i);
+                }
+            }
+            break;
+        }
     }
 }
 

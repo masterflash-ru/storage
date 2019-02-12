@@ -1,6 +1,6 @@
 <?php
 /**
-фильтр копирования в хранилище картинок
+фильтр копирования в хранилище файлов
  */
 namespace Mf\Storage\Filter;
 
@@ -33,12 +33,15 @@ public function __construct($options = array())
 	
 
 /**
-собственно сам фильтр
-на входе путь+ файл, главное что бы он читался, путь любой
+* собственно сам фильтр
+* на входе путь+ файл, главное что бы он читался, путь любой
+* на выходе МАССИВ! 
 */
 public function filter($value)
 {
-
+    if (!is_string($value)){
+        throw new Exception("Для фильтра CopyToStorage на входе должна быть строка с полным именем файла для обработки");
+    }
     $target=rtrim($this->_options['target_folder'],DIRECTORY_SEPARATOR).DIRECTORY_SEPARATOR;
 
     $newfilename=$this->CreateName($value);
@@ -50,16 +53,15 @@ public function filter($value)
 	if (!copy($value,$target.$newfilename)) {
             throw new Exception("Не удается скопировать файл из {$value}, в {$target}");
     }
-    return $target.$newfilename;
+    return ["default"=>$target.$newfilename];
 }
 
 /*
-
-генерация имени файла исходя из исходного
-по сути берется его расширение, и приклеивается к md5(microtime()) и все
-$filename - имя файла на входе
-стратегия переименования: уникальные хеши, транслит, и как есть, но имя чистится от пробелов и прочих запрещеных символов
-возвращает строку включая путь вида fdg/sdf/sdfdsgdfgdfg.jpg
+* генерация имени файла исходя из исходного
+* по сути берется его расширение, и приклеивается к md5(microtime()) и все
+* $filename - имя файла на входе
+* стратегия переименования: уникальные хеши, транслит, и как есть, но имя чистится от пробелов и прочих запрещеных символов
+* возвращает строку включая путь вида fdg/sdf/sdfdsgdfgdfg.jpg
 */
 protected function CreateName($filename)
 {
@@ -87,12 +89,10 @@ protected function CreateName($filename)
     }
 
 	$p=[];
-	for($i=0; $i<(int)$this->_options['folder_level']; $i++)
-		{
-			$p[]=substr($name,$i*$this->_options['folder_name_size'],$this->_options["folder_name_size"]);
-		}
-	$pp=implode(DIRECTORY_SEPARATOR,$p);
-
+	for($i=0; $i<(int)$this->_options['folder_level']; $i++){
+        $p[]=substr($name,$i*$this->_options['folder_name_size'],$this->_options["folder_name_size"]);
+    }
+    $pp=implode(DIRECTORY_SEPARATOR,$p);
 	return trim($pp.DIRECTORY_SEPARATOR.str_replace(implode("",$p),"",$name),DIRECTORY_SEPARATOR);
 }
 

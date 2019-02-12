@@ -21,8 +21,8 @@ public function __invoke($razdel,$razdel_id)
 	$files=$this->FilesLib->loadFiles($razdel,$razdel_id);
     $view=$this->getView();
     $rez=[];
-    foreach ($files as $f){
-        $rez[]=$view->basePath($f);
+    foreach ($files as $k=>$f){
+        $rez[$k]=$view->basePath($f);
     }
     
 	return $rez;
