@@ -11,8 +11,15 @@ use Exception;
 class CopyToStorage  implements FilterInterface
 {
 
+    protected static $classMap = [
+        'localfilesystem'  => 'Mf\Storage\Filter\Adapter\LocalFileSystem',
+        ];
+
+		
+	protected $_adapter=null;
 
 	protected $_options = [
+        'adapter' => 'LocalFileSystem',
         'target_folder' => '',          //базовый путь локальный к корню хранилища
         'folder_level' => 3,            //уровень вложений
         'folder_name_size' =>3,         //размер подпапок
@@ -26,7 +33,7 @@ class CopyToStorage  implements FilterInterface
         
 	];
 
-public function __construct($options = array())
+public function __construct(array $options = [])
 {
 	$this->setOptions($options);
 }
@@ -35,25 +42,18 @@ public function __construct($options = array())
 /**
 * собственно сам фильтр
 * на входе путь+ файл, главное что бы он читался, путь любой
-* на выходе МАССИВ! 
+* на выходе МАССИВ! ключ "default" означает исходный файл, который потом и обрабатывается
 */
 public function filter($value)
 {
     if (!is_string($value)){
         throw new Exception("Для фильтра CopyToStorage на входе должна быть строка с полным именем файла для обработки");
     }
-    $target=rtrim($this->_options['target_folder'],DIRECTORY_SEPARATOR).DIRECTORY_SEPARATOR;
+    /*новое имя файла*/
+    $to=$this->CreateName($value);
 
-    $newfilename=$this->CreateName($value);
-    //смотрим есть ли каталоги в новом пути, если нет, создаем
-	$path=dirname( $target.$newfilename);
-	if (!is_dir($path)) {mkdir($path,0777,true);}
-
-
-	if (!copy($value,$target.$newfilename)) {
-            throw new Exception("Не удается скопировать файл из {$value}, в {$target}");
-    }
-    return ["default"=>$target.$newfilename];
+    $target_and_file= $this->_adapter->copy($value,$to);
+    return ["default"=>$target_and_file];
 }
 
 /*
@@ -99,22 +99,33 @@ protected function CreateName($filename)
     
     
     
-/*
-установить опции
+/**
+*установить опции
 */
-public function setOptions(array $options)
+	public function setOptions(array $options=[])
 	{
-		if (!is_array($options)) {
-			throw new Exception("Не допустимая опция, должен быть массив");	
-		}
-        
-        if (!empty($options)&& is_array($options)){
+        if (!empty($options) && is_array($options)){
             foreach ($options as $k => $v) {
-                    if (array_key_exists($k, $this->_options)) {$this->_options[$k] = $v;}
+                if (array_key_exists($k, $this->_options)) {
+                    $this->_options[$k] = $v;
+                }
             }
         }
 
+        $adapter=$this->_options['adapter'];
 
+        if (isset(static::$classMap[strtolower($adapter)])) {
+            $adapter = static::$classMap[strtolower($adapter)];
+        }
+        if (! class_exists($adapter)) {
+            throw new Exception(sprintf(
+                '%s не допустимое имя адаптера: "%s"',
+                __METHOD__,
+                $adapter
+            ));
+        }
+        
+		$this->_adapter=new $adapter($this->_options);
 		return $this;
 	}
 
