@@ -232,7 +232,7 @@ public function loadFilesArray($razdel,$razdel_id)
              $rez=unserialize($rs->Fields->Item["file_array"]->Value);
              $rez["version"]=(float)$rs->Fields->Item["version"]->Value;
              $this->cache->setItem($key, $rez);
-              $this->cache->setTags($key,[$razdel]);
+             $this->cache->setTags($key,[$razdel]);
          }
      }
     return $rez;    

@@ -58,7 +58,7 @@ public function __invoke($razdel=null,$razdel_id=null,$item_storage_name=null,ar
 public function render($razdel,$razdel_id,$item_storage_name)
 {
     $view=$this->getView();
-    
+    $defimg="";
     $images=$this->ImagesLib->loadPictures($razdel,$razdel_id,$item_storage_name);
     $pic=["<picture>"];
     if (!isset($this->options["attributes"]["alt"])){
@@ -67,8 +67,11 @@ public function render($razdel,$razdel_id,$item_storage_name)
     if (empty($images)) {
         //нет изображения, загружаем заглушку
         $images["default"]=$this->options["default_image"];
-    } 
-    
+    } elseif(!isset($images["default"]) && isset($images[$item_storage_name])){
+        //это версия 1 хранилища. там один файл, ключ это имя жлемента хранилища
+        $images=["default"=>$images[$item_storage_name]];
+    }
+
     foreach ($images as $type=>$item){
         $img=$view->basePath($item);
         switch ($type){
