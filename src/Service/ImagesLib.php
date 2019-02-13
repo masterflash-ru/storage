@@ -40,6 +40,17 @@ public function loadImage($razdel,$razdel_id,$item_name)
     return $this->loadFile($razdel,$razdel_id,$item_name);
 }
 
+/*
+получить путь к файлу
+$razdel - имя раздела, например, news,
+$razdel_id - ID элемента, например ID новости,
+$item_name - имя фотоэлемента, например, admin_img или anons
+возвращает массив имен элементов файлов-картинок с относительным путем
+*/
+public function loadPictures($razdel,$razdel_id,$item_name)
+{
+    return $this->loadFiles($razdel,$razdel_id,$item_name);
+}
 
 
 

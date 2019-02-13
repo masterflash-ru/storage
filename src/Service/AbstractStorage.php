@@ -231,10 +231,8 @@ public function loadFilesArray($razdel,$razdel_id)
          if (!$rs->EOF){
              $rez=unserialize($rs->Fields->Item["file_array"]->Value);
              $rez["version"]=(float)$rs->Fields->Item["version"]->Value;
-             if (!empty($rez)) {
-                 $this->cache->setItem($key, $rez);
-                 $this->cache->setTags($key,[$razdel]);
-             }
+             $this->cache->setItem($key, $rez);
+              $this->cache->setTags($key,[$razdel]);
          }
      }
     return $rez;    

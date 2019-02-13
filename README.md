@@ -146,8 +146,13 @@ $ImgLib->deleteFileRazdel($razdel_name);
 Библиотека регистрирует помощник для view, при помощи которого можно получить сразу имя файла и путь, готовых для тега <img>
 По сути помощник вызывает loadImage с этим же параметрами, дополнительно обрабатывает помощником basePath фреймворка
 ```html
-<img src="<?=$this->ImageStorage($stream_name,$id,$item_name);?>" />
+<img src="<?=$this->ImageStorage($stream_name,$id,$storage_item_name);?>" />
 ```
+Имеется помощник PictureStorage, который генерирует новомодный тег <picture>, например,
+```html
+<?=$this->PictureStorage($stream_name,$id,$storage_item_name,["alt"=>"Подпись фото"]);?>
+```
+4-й параметр массив атрибут для тега img, вставляется как есть
 
 В конфиге приложения должны быть настройки кэша:
 ```php

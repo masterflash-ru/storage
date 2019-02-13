@@ -1,7 +1,7 @@
 <?php
 /**
-библиотека работы с изображениями
- */
+*библиотека работы с файлами
+*/
 
 namespace Mf\Storage;
 
@@ -17,6 +17,7 @@ return [
     'view_helpers' => [
         'factories' => [
             View\Helper\ImageStorage::class => View\Helper\Factory\ImageStorage::class,
+            View\Helper\PictureStorage::class => View\Helper\Factory\ImageStorage::class,
             View\Helper\FilesStorage::class => View\Helper\Factory\FilesStorage::class,
         ],
         'aliases' => [
@@ -24,7 +25,8 @@ return [
 			'imagestorage' => View\Helper\ImageStorage::class,
             'FilesStorage' => View\Helper\FilesStorage::class,
 			'filestorage' => View\Helper\FilesStorage::class,
-			
+            'PictureStorage' => View\Helper\PictureStorage::class,
+			'picturestorage' => View\Helper\PictureStorage::class,
         ],
     ],
 

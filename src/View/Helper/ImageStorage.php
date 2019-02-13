@@ -8,7 +8,7 @@ namespace Mf\Storage\View\Helper;
 use Zend\View\Helper\AbstractHelper;
 
 /**
- * помощник - генератор меню админки
+ * помощник
  */
 class ImageStorage extends AbstractHelper 
 {
