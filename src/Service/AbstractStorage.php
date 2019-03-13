@@ -42,7 +42,7 @@ public function __construct($connection,$config,$cache)
 public function selectStorageItem($name)
 {
     if (empty($this->config['items'][$name])){
-        throw new Exception("Элемента $name нет в настройках элементов хранилища");
+        throw new Exception("Элемента '$name' нет в настройках элементов хранилища");
     }
 	$this->media=$this->config['items'][$name];
     $this->base_public_path=rtrim(
@@ -75,7 +75,7 @@ public function saveFiles($filename,$razdel,$razdel_id)
             foreach ($size_info["validators"] as $validator=>$options){
                 $vChain->attachByName($validator,$options);
             }
-                
+            
             if (!$vChain->isValid($this->source_folder.$filename)){
                 foreach ($vChain->getMessages() as $message) {
                     trigger_error($message, E_USER_WARNING);
@@ -204,11 +204,49 @@ public function loadFiles($razdel,$razdel_id)
             break;
         }
     }
-
-    
     return $ret;
 }
 
+/**
+* перемещение файла в другое хранилище
+* $old_name - старое имя хранилище (имя секции из конфига)
+* $new_name - новое имя хранилища из конфига
+* $id - идентификатор файла
+* ничего не возвращает, если базовые пути отличаются, тогда исключение, этот тип переноса пока не работает
+*/
+public function renameImages(string $old_name,string $new_name,$id)
+{
+    $id=(int)$id;
+    if (empty($this->config['items'][$old_name])){
+        throw new Exception("Элемента '$old_name' нет в настройках элементов хранилища");
+    }
+    //старый путь к файлу
+    $old_base_public_path=rtrim(
+            getcwd().
+            str_replace(getcwd(),"",$_SERVER['DOCUMENT_ROOT']).
+            DIRECTORY_SEPARATOR .
+            $this->config['file_storage'][$this->config['items'][$old_name]["file_storage"]] ["base_url"],DIRECTORY_SEPARATOR
+            ).DIRECTORY_SEPARATOR;
+    
+    if (empty($this->config['items'][$new_name])){
+        throw new Exception("Элемента '$new_name' нет в настройках элементов хранилища");
+    }
+    //новый путь
+    $new_base_public_path=rtrim(
+            getcwd().
+            str_replace(getcwd(),"",$_SERVER['DOCUMENT_ROOT']).
+            DIRECTORY_SEPARATOR .
+            $this->config['file_storage'][$this->config['items'][$new_name]["file_storage"]] ["base_url"],DIRECTORY_SEPARATOR
+            ).DIRECTORY_SEPARATOR;
+    //если не совпадают, тогда переносим файл физически
+    if ($old_base_public_path!=$new_base_public_path){
+         throw new Exception("Пока не поддерживается перенос файлов в хранилище, расположенное в другом месте!");
+    }
+    //меняем запись в базе
+    $this->clearStorage();
+    $r=0;
+    $this->connection->Execute("update storage set razdel='{$new_name}' where razdel='{$old_name}' and id=$id",$r,adExecuteNoRecords);
+}
     
 /*
 получить путь к файлу+ сам файл для всех элементов в виде массива
@@ -247,19 +285,9 @@ $razdel_id - ID элемента, например ID новости,
 public function deleteFile($razdel,$razdel_id)
 {
 	$razdel_id=(int)$razdel_id;
-	$rs=new RecordSet();
-    $rs->CursorType = adOpenKeyset;
-	$rs->open("SELECT * FROM storage where id=".$razdel_id." and razdel='{$razdel}' or todelete>0",$this->connection);
-	while(!$rs->EOF){
-        $del=unserialize($rs->Fields->Item["file_array"]->Value);
-        $this->delItem($del,$rs->Fields->Item["version"]->Value);
-        $rs->Delete();
-        $rs->Update();
-        $rs->MoveNext();
-    }
-	$this->deleteEmptyDir();
-	$razdel=preg_replace('/[^0-9a-zA-Z_\-]/iu', '',$razdel);
-	$this->cache->removeItem("storage_lib_{$razdel}_{$razdel_id}");
+    $r=0;
+    $this->connection->Execute("update storage set todelete=1 where id=".$razdel_id." and razdel='{$razdel}'",$r,adExecuteNoRecords);
+    $this->clearStorage();
 }
 
 /*
@@ -268,19 +296,31 @@ $razdel - имя раздела, например, news,
 */
 public function deleteFileRazdel($razdel)
 {
-    $razdel=preg_replace('/[^0-9a-zA-Z_\-]/iu', '',$razdel);
+    $r=0;
+    $this->connection->Execute("update storage set todelete=1 where razdel='{$razdel}'",$r,adExecuteNoRecords);
+    $this->clearStorage();
+}
+/*
+чистка хранилища
+*/
+public function clearStorage()
+{
 	$rs=new RecordSet();
     $rs->CursorType = adOpenKeyset;
-	$rs->open("SELECT * FROM storage where razdel='{$razdel}' or todelete>0",$this->connection);
+	$rs->open("SELECT * FROM storage where  todelete>0",$this->connection);
+    $razdel=[];
 	while(!$rs->EOF){
         $del=unserialize($rs->Fields->Item["file_array"]->Value);
         $this->delItem($del,$rs->Fields->Item["version"]->Value);
         $rs->Delete();
         $rs->Update();
         $rs->MoveNext();
+        $razdel[]=$rs->Fields->Item["razdel"]->Value;
     }
 	$this->deleteEmptyDir();
-    $this->cache->clearByTags([$razdel],true);
+    $this->cache->clearByTags($razdel,true);
+    $rs->Close();
+    $this->connection->Execute("delete from storage where todelete>0",$r,adExecuteNoRecords);
 }
 
 
