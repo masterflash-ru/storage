@@ -300,8 +300,9 @@ public function deleteFileRazdel($razdel)
     $this->connection->Execute("update storage set todelete=1 where razdel='{$razdel}'",$r,adExecuteNoRecords);
     $this->clearStorage();
 }
-/*
-чистка хранилища
+
+/**
+* чистка хранилища
 */
 public function clearStorage()
 {
@@ -311,11 +312,11 @@ public function clearStorage()
     $razdel=[];
 	while(!$rs->EOF){
         $del=unserialize($rs->Fields->Item["file_array"]->Value);
+        $razdel[]=$rs->Fields->Item["razdel"]->Value;
         $this->delItem($del,$rs->Fields->Item["version"]->Value);
         $rs->Delete();
         $rs->Update();
         $rs->MoveNext();
-        $razdel[]=$rs->Fields->Item["razdel"]->Value;
     }
 	$this->deleteEmptyDir();
     $this->cache->clearByTags($razdel,true);
