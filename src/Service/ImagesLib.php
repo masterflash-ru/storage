@@ -41,6 +41,18 @@ public function loadImage($razdel,$razdel_id,$item_name)
 }
 
 /*
+проверить наличие файла
+$razdel - имя раздела, например, news,
+$razdel_id - ID элемента, например ID новости,
+возвращает true/false - да/нет
+*/
+public function hasImage($razdel,$razdel_id)
+{
+    return $this->hasFile($razdel,$razdel_id);
+}
+
+    
+/*
 получить путь к файлу
 $razdel - имя раздела, например, news,
 $razdel_id - ID элемента, например ID новости,
