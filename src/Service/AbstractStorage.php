@@ -139,7 +139,7 @@ public function saveFiles($filename,$razdel,$razdel_id)
 public function hasFile($razdel,$razdel_id)
 {
     $razdel_id=(int)$razdel_id;
-    $rs=$this->connection->Execute("SELECT id FROM storage where id=".$razdel_id." and razdel='{$razdel}' limit 1");
+    $rs=$this->connection->Execute("SELECT id FROM storage where id=".$razdel_id." and razdel='{$razdel} and todelete=0' limit 1");
     return !$rs->EOF;
 }
 
