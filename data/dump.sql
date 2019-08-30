@@ -25,7 +25,7 @@ CREATE TABLE `storage` (
   `version` float(9,1) DEFAULT NULL COMMENT 'версия хранилища',
   PRIMARY KEY (`id`,`razdel`),
   KEY `todelete` (`todelete`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COMMENT='Хранилище файлов';
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COMMENT='Хранилище файлов';
 --
 -- Dumping routines for database 'simba4'
 --
