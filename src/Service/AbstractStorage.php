@@ -28,6 +28,9 @@ abstract class AbstractStorage
 */
 public function __construct($connection,$config,$cache) 
 {
+    if (!isset($config["clear_storage_only_cron"])){
+        $config["clear_storage_only_cron"]=false;
+    }
 	$this->config=$config;
 	$this->connection=$connection;
 	$this->cache=$cache;
@@ -253,8 +256,9 @@ public function renameImages(string $old_name,string $new_name,$id)
     if ($old_base_public_path!=$new_base_public_path){
          throw new Exception("Пока не поддерживается перенос файлов в хранилище, расположенное в другом месте!");
     }
-    //меняем запись в базе
-    $this->clearStorage();
+    if (!$this->config["clear_storage_only_cron"]){
+        $this->clearStorage();
+    }
     $r=0;
     $this->connection->Execute("update storage set razdel='{$new_name}' where razdel='{$old_name}' and id=$id",$r,adExecuteNoRecords);
 }
@@ -298,7 +302,10 @@ public function deleteFile($razdel,$razdel_id)
 	$razdel_id=(int)$razdel_id;
     $r=0;
     $this->connection->Execute("update storage set todelete=1 where id=".$razdel_id." and razdel='{$razdel}'",$r,adExecuteNoRecords);
-    $this->clearStorage();
+    if (!$this->config["clear_storage_only_cron"]){
+        $this->clearStorage();
+    }
+
 }
 
 /*
@@ -309,7 +316,10 @@ public function deleteFileRazdel($razdel)
 {
     $r=0;
     $this->connection->Execute("update storage set todelete=1 where razdel='{$razdel}'",$r,adExecuteNoRecords);
-    $this->clearStorage();
+    if (!$this->config["clear_storage_only_cron"]){
+        $this->clearStorage();
+    }
+
 }
 
 /**
