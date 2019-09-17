@@ -32,6 +32,18 @@ return [
         'factories' => [//сервисы-фабрики
             Service\ImagesLib::class => Service\Factory\FilesLibFactory::class,
             Service\FilesLib::class => Service\Factory\FilesLibFactory::class,
+            Service\GalleryLib::class => Service\Factory\FilesLibFactory::class,
+        ],
+        'aliases' => [
+            "ImagesLib"=>Service\ImagesLib::class,
+            "Imageslib"=>Service\ImagesLib::class,
+            "imageslib"=>Service\ImagesLib::class,
+            "FilesLib"=>Service\FilesLib::class,
+            "Fileslib"=>Service\FilesLib::class,
+            "fileslib"=>Service\FilesLib::class,
+            "GalleryLib"=>Service\GalleryLib::class,
+            "Gallerylib"=>Service\GalleryLib::class,
+            "gallerylib"=>Service\GalleryLib::class,
         ],
     ],
 
