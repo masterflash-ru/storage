@@ -42,7 +42,7 @@ public function __construct($connection,$config,$cache)
 активирует из списка элементов обработчиков хранилища нужный элемент, 
 передается ключ к массиву для items
 */
-public function selectStorageItem(string $name)
+public function selectStorageItem($name)
 {
     if (empty($this->config['items'][$name])){
         throw new Exception("Элемента '$name' нет в настройках элементов хранилища");
@@ -57,14 +57,14 @@ public function selectStorageItem(string $name)
 }
 
 
-/**
-* Создание библиотеки файлов по результатам информации, переданной в selectStorageItem
-* на входе имя файла, который находится во временном хранилище БЕЗ ПУТИ!
-* $filename = имя файла из которого создаются все размеры, обычно в data/images
-* $razdel - имя раздела, например, news
-* $razdel_id - уникальный номер записи, обычно ID записи, например в новостях
+/*
+Создание библиотеки файлов по результатам информации, переданной в selectStorageItem
+на входе имя файла, который находится во временном хранилище БЕЗ ПУТИ!
+$filename = имя файла из которого создаются все размеры, обычно в data/images
+$razdel - имя раздела, например, news
+$razdel_id - уникальный номер записи, обычно ID записи, например в новостях
 */
-public function saveFiles(string $filename,string $razdel,$razdel_id)
+public function saveFiles($filename,$razdel,$razdel_id)
 {
     $razdel_id=(int)$razdel_id;
 	$rez=[];
@@ -134,13 +134,12 @@ public function saveFiles(string $filename,string $razdel,$razdel_id)
     unlink($this->source_folder.$filename);
     return $rez;
 }
-
 /**
 * проверить сущетсвование файлов в хранилище по имени раздела и ID
 * $razdel - имя раздела, например, news,
 * $razdel_id - ID элемента, например ID новости,
 */
-public function hasFile(string $razdel,$razdel_id)
+public function hasFile($razdel,$razdel_id)
 {
     $razdel_id=(int)$razdel_id;
     $rs=$this->connection->Execute("SELECT id FROM storage where id=".$razdel_id." and razdel='{$razdel} and todelete=0' limit 1");
@@ -148,14 +147,14 @@ public function hasFile(string $razdel,$razdel_id)
 }
 
     
-/**
-* получить путь к файлу+ сам файл
-* $razdel - имя раздела, например, news,
-* $razdel_id - ID элемента, например ID новости,
-* $item_name - имя фотоэлемента, например, admin_img или anons
-* возвращает полный URL путь с файлом, готовые для вставки в тег <img....
+/*
+получить путь к файлу+ сам файл
+$razdel - имя раздела, например, news,
+$razdel_id - ID элемента, например ID новости,
+$item_name - имя фотоэлемента, например, admin_img или anons
+возвращает полный URL путь с файлом, готовые для вставки в тег <img....
 */
-public function loadFile(string $razdel,$razdel_id,$item_name)
+public function loadFile($razdel,$razdel_id,$item_name)
 {
     $rez=$this->loadFilesArray($razdel,$razdel_id);
     /*получить само хранилище по имени*/
@@ -179,14 +178,14 @@ public function loadFile(string $razdel,$razdel_id,$item_name)
 	return "";
 }
 
-/**
+/*
 получить путь к файлам+ сами файлы - МАССИВ! 
 $razdel - имя раздела, например, news,
 $razdel_id - ID элемента, например ID новости,
 $item_name - имя фотоэлемента, например, admin_img или anons
 возвращает полный URL путь с файлом, готовые для вставки в тег <img....
 */
-public function loadFiles(string $razdel,$razdel_id)
+public function loadFiles($razdel,$razdel_id)
 {
     $rez=$this->loadFilesArray($razdel,$razdel_id);
     /*получить само хранилище по имени*/
@@ -271,17 +270,16 @@ $razdel_id - ID элемента, например ID новости,
 $item_name - имя фотоэлемента, например, admin_img или anons
 возвращает полный URL путь с файлом, готовые для вставки в тег <img....
 */
-public function loadFilesArray(string $razdel,$razdel_id)
+public function loadFilesArray($razdel,$razdel_id)
 {
     $razdel_id=(int)$razdel_id;
 	 $result = false;
 	 $key="storage_lib_".preg_replace('/[^0-9a-zA-Z_\-]/iu', '',$razdel)."_{$razdel_id}";
-
      $rez = $this->cache->getItem($key, $result);
      if (!$result){
          $rez=[];
          $rs=new RecordSet();
-         $rs->open("SELECT * FROM storage where id=".$razdel_id." and razdel='{$razdel}' and todelete=0",$this->connection);
+         $rs->open("SELECT * FROM storage where id=".$razdel_id." and razdel='{$razdel}'",$this->connection);
          if (!$rs->EOF){
              $rez=unserialize($rs->Fields->Item["file_array"]->Value);
              $rez["version"]=(float)$rs->Fields->Item["version"]->Value;
@@ -298,7 +296,7 @@ public function loadFilesArray(string $razdel,$razdel_id)
 $razdel - имя раздела, например, news,
 $razdel_id - ID элемента, например ID новости,
 */
-public function deleteFile(string $razdel,$razdel_id)
+public function deleteFile($razdel,$razdel_id)
 {
 	$razdel_id=(int)$razdel_id;
     $r=0;
@@ -313,7 +311,7 @@ public function deleteFile(string $razdel,$razdel_id)
 удалить массив файлов всего раздела
 $razdel - имя раздела, например, news,
 */
-public function deleteFileRazdel(string $razdel)
+public function deleteFileRazdel($razdel)
 {
     $r=0;
     $this->connection->Execute("update storage set todelete=1 where razdel='{$razdel}'",$r,adExecuteNoRecords);
@@ -358,7 +356,7 @@ public function getSourceFolder()
 /*
 * сервисные, установить папку в которой исходыне файлы
 */
-public function setSourceFolder(string $path)
+public function setSourceFolder($path)
 {
     $this->source_folder=$path;
 }
@@ -392,7 +390,7 @@ protected function deleteEmptyDir()
 }
 
 /*
-* вспомогательная удаление файлов согласно описания 
+вспомогательная удаление файлов согласно описания 
 */
 protected function delItem($del,$version=1)
 {
