@@ -18,6 +18,7 @@ class IndexController extends AbstractActionController
     }
     public function indexAction()
     {
+        set_time_limit(0);
         $view=new ViewModel();
         $view->setTerminal(true);
         $this->ImagesLib->clearStorage();
