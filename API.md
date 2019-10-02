@@ -61,6 +61,71 @@ __invoke($razdel=null,$razdel_id=null,$item_storage_name=null,array $options=[])
 setOptions(array $options=[]) | Установить опции 
 render($razdel,$razdel_id,$item_storage_name) | По сути __invoke пока
 
+Для работы с файлами имеются в комплекте фильтры-обработчики файлов. Для обработки фото нужно установить пакет composer require masterflash-ru/imglib
+Фильтры используются для обработки по правилам указаным в элементах items конфига хранилища.
+```php
+/*Пример конфига хранилища*/
+    "storage"=>[
+        'data_folder'=>"data/datastorage",      //папка с исходными файлами
+        'file_storage'=>[
+            'default'=>[
+                'base_url'=>"media/pics/",      //собственно хранилище файлов, их может быть много
+            ],
+        ],
 
+        'items'=>[
+            /*хранилище для ленты новостей, ключ это имя секции, которая используется для работы
+            он же является именем раздела, под которым записываются и считываются файлы*/
+            "news"=>[
+                "description"=>"Хранение фото новостей",
+                'file_storage'=>'default',
+                'file_rules'=>[
+                            'admin_img'=>[
+                                'filters'=>[
+                                        CopyToStorage::class => [
+                                                    'folder_level'=>0,
+                                                    'folder_name_size'=>3,
+                                                    'strategy_new_name'=>'md5'
+                                        ],
+                                        ImgResize::class=>[
+                                                    "method"=>2,
+                                                    "width"=>250,
+                                                    "height"=>150,
+                                                    'adapter'=>Gd::class,
+                                        ],
+    
+                                ],
+                                'validators' => [
+                                        IsImage::class=>[],
+                                        ImageSize::class => [
+                                            'minWidth' => 222,
+                                            'minHeight' => 166,
+                                    ],
+                                ],
+                            ],
+                            'anons'=>[
+                                'filters'=>[
+                                        CopyToStorage::class => [
+                                                    'folder_level'=>0,
+                                                    'folder_name_size'=>3,
+                                                    'strategy_new_name'=>'md5'
+                                        ],
+                                        ImgResize::class=>[
+                                                    "method"=>1,
+                                                    "width"=>222,
+                                                    "height"=>166,
+                                                    'adapter'=>'gd',
+                                        ],
+                                ],
+                            ],
+                ],
+            ],//news
+        ],
+    ],
+```
+Рассмотрим встроенные фильтры:
+CopyToStorage - пока единственный который копирует из папки источника в папку хранилища, создавая необходимые папки и имя файла. 
+Из адаптеров доступен пока только Mf\Storage\Filter\Adapter\LocalFileSystem - который работает с локальной файловой системой.
+Другие фильтры для обработки изображений перенесены в пакет masterflash-ru/imglib.
 
 
