@@ -3,11 +3,12 @@
 Используется пространство имен Mf\Storage.
 
 
-Сервис Mf\Storage\ImagesLib он расширяет абстрактный класс AbstractStorage в котором все и производится. Сервис Mf\Storage\FilesLib полностью повторяет абстрактный класс.
+Сервис Mf\Storage\ImagesLib он расширяет абстрактный класс AbstractStorage в котором все и производится. 
+Сервис Mf\Storage\FilesLib полностью повторяет абстрактный класс.
 Псевдонимы:
-loadImage -> loadFile
-hasImage -> hasFile
-loadPictures -> loadFile
+1. loadImage -> loadFile
+2. hasImage -> hasFile
+3. loadPictures -> loadFile
 
 
 Вызовы абстрактного класса:
