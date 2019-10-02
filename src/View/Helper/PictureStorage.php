@@ -106,6 +106,7 @@ public function setOptions(array $options=[])
             $this->options["attributes"][$k] = $v;
         }
     }
+    return $this;
 }
 
     /**
