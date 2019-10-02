@@ -118,7 +118,6 @@ public function saveFiles($filename,$razdel,$razdel_id)
         $rs->AddNew();
         $rs->Fields->Item["razdel"]->Value=$razdel;
         $rs->Fields->Item["id"]->Value=$razdel_id;
-        $rs->Fields->Item["todelete"]->Value=0;
     } else  {
         //удалим старые файлы
         $del=unserialize($rs->Fields->Item["file_array"]->Value);
@@ -127,6 +126,7 @@ public function saveFiles($filename,$razdel,$razdel_id)
         $razdel=preg_replace('/[^0-9a-zA-Z_\-]/iu', '',$razdel);
         $this->cache->removeItem("storage_lib_{$razdel}_".$razdel_id);
 	}
+    $rs->Fields->Item["todelete"]->Value=0;
     $rs->Fields->Item["version"]->Value=static::VERSION;
     $rs->Fields->Item["file_array"]->Value=serialize($rez);
     $rs->Update();
@@ -148,8 +148,8 @@ public function hasFile($razdel,$razdel_id)
 
     
 /*
-получить путь к файлу+ сам файл
-$razdel - имя раздела, например, news,
+* получить путь к файлу+ сам файл
+* $razdel - имя раздела, например, news,
 $razdel_id - ID элемента, например ID новости,
 $item_name - имя фотоэлемента, например, admin_img или anons
 возвращает полный URL путь с файлом, готовые для вставки в тег <img....
