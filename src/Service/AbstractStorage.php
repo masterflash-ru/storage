@@ -142,7 +142,7 @@ public function saveFiles($filename,$razdel,$razdel_id)
 public function hasFile($razdel,$razdel_id)
 {
     $razdel_id=(int)$razdel_id;
-    $rs=$this->connection->Execute("SELECT id FROM storage where id=".$razdel_id." and razdel='{$razdel} and todelete=0' limit 1");
+    $rs=$this->connection->Execute("SELECT id FROM storage where id=".$razdel_id." and razdel='{$razdel} and (todelete=0 or todelete is null)' limit 1");
     return !$rs->EOF;
 }
 
@@ -279,7 +279,7 @@ public function loadFilesArray($razdel,$razdel_id)
      if (!$result){
          $rez=[];
          $rs=new RecordSet();
-         $rs->open("SELECT * FROM storage where id=".$razdel_id." and razdel='{$razdel}'",$this->connection);
+         $rs->open("SELECT * FROM storage where id=".$razdel_id." and razdel='{$razdel}' and (todelete!=1 or todelete is null)",$this->connection);
          if (!$rs->EOF){
              $rez=unserialize($rs->Fields->Item["file_array"]->Value);
              $rez["version"]=(float)$rs->Fields->Item["version"]->Value;
