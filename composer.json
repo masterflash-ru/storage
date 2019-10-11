@@ -27,12 +27,15 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-master": "1.1-dev",
-            "dev-develop": "1.1-dev"
+            "dev-master": "1.3-dev",
+            "dev-develop": "1.3-dev"
         },
         "zf": {
             "component": "Mf\\Storage",
             "config-provider": "masterflash-ru\\Mf\\Storage\\ConfigProvider"
         }
-    }
+    },
+    "bin": [
+        "bin/clear-storage"
+    ]
 }
