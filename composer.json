@@ -35,6 +35,9 @@
             "config-provider": "masterflash-ru\\Mf\\Storage\\ConfigProvider"
         }
     },
+    "scripts":{
+        "clear-storage":"clear-storage"
+    },
     "bin": [
         "bin/clear-storage"
     ]
