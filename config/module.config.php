@@ -8,25 +8,6 @@ namespace Mf\Storage;
 use Zend\Router\Http\Literal;
 
 return [
-    'router' => [
-        'routes' => [
-            'clear-storage-cron' => [
-                'type' => Literal::class,
-                'options' => [
-                    'route'    => '/clear-storage-cron',
-                    'defaults' => [
-                        'controller' => Controller\IndexController::class,
-                        'action'     => 'index',
-                    ],
-                ],
-            ],
-        ],
-    ],
-    'controllers' => [
-        'factories' => [
-            Controller\IndexController::class =>Controller\IndexControllerFactory::class,
-        ],
-    ],
 
     'service_manager' => [
         'factories' => [//сервисы-фабрики
@@ -56,11 +37,6 @@ return [
 			'filestorage' => View\Helper\FilesStorage::class,
             'PictureStorage' => View\Helper\PictureStorage::class,
 			'picturestorage' => View\Helper\PictureStorage::class,
-        ],
-    ],
-    'view_manager' => [
-        'template_path_stack' => [
-            __DIR__ . '/../view',
         ],
     ],
 ];
