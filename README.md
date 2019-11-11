@@ -102,7 +102,7 @@ composer require masterflash-ru/storage
 
 ```php
 /*объект ImagesLib регистрируется в менеджере, его можно извлечь в фабриках, если нужна обработка*/
-use Images\Service\ImagesLib;
+use Mf\Storage\Service\ImagesLib;
 
 /*получить экземпляр*/
 $imglib=$container->get(ImagesLib::class);
@@ -117,7 +117,7 @@ $ImgLib->selectStorageItem($name);
 
 /*
 далее нужно передать исходный файл в виде пути и имени, имя раздела и идентификатор записи раздела
-$filename - исходное имя файла, как правило в data/images,
+$filename - исходное имя файла, как правило в data/datastorage,
 $razdel - имя раздела, например, news (обычно совпадает с именем массива фото, и равно ключу в имени конфига),
 $razdel_id - внутренний идентификатор элемента, например, ID новости в ленте
 */
