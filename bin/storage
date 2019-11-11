@@ -1,0 +1,47 @@
+#!/usr/bin/env php
+<?php
+/**
+ */
+
+namespace Mf\Storage;
+
+
+use Symfony\Component\Console\Application;
+use Symfony\Component\Console\Helper\HelperSet;
+use Symfony\Component\Console\Helper\QuestionHelper;
+
+use Zend\Mvc\Application as ZfApplication;
+use Zend\Stdlib\ArrayUtils;
+
+
+
+chdir(__DIR__."/../../../..");
+
+// Setup/verify autoloading
+if (file_exists($a = __DIR__ . '/../../../autoload.php')) {
+    require $a;
+} elseif (file_exists($a = __DIR__ . '/../vendor/autoload.php')) {
+    require $a;
+} else {
+    fwrite(STDERR, 'Cannot locate autoloader; please run "composer install"' . PHP_EOL);
+    exit(1);
+}
+
+//инициализация приложения ZF3
+$appConfig = require  getcwd().'/config/application.config.php';
+if (file_exists( getcwd().'/config/development.config.php')) {
+    $appConfig = ArrayUtils::merge($appConfig, require  getcwd().'/config/development.config.php');
+}
+$zf=ZfApplication::init($appConfig);
+$ServiceManager=$zf->getServiceManager();
+
+
+$application = new Application('Storage management','0.0.1');
+$helperSet=new helperSet();
+$helperSet->set(new QuestionHelper(), 'question');
+$application->setHelperSet($helperSet);
+$application->add(new Command\Clear($ServiceManager));
+
+
+$application->run();
+

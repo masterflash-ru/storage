@@ -36,9 +36,9 @@
         }
     },
     "scripts":{
-        "clear-storage":"clear-storage"
+        "storage":"storage"
     },
     "bin": [
-        "bin/clear-storage"
+        "bin/storage"
     ]
 }
