@@ -202,8 +202,9 @@ $ImgLib->deleteFileRazdel($razdel_name);
 Если хранилище не большого размера, то можно чистку делать при каждой операции в нем, для этого в конфиге "clear_storage_only_cron" присвойте true. 
 В принципе можно не чистить, если операций не много.
 Для очистки хранилища можно использовать консольную команду из корня приложения:
-```bash
-./vendor/bin/storage clear all
+```php
+./vendor/bin/storage clear www all
  ```
+ Где www - Публичная папка, на нее указывает веб сервер, all - все чистить
  Данная команда требует установки пакета symfony/console, при помощи команды composer require symfony/console
 

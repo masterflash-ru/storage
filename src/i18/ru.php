@@ -2,6 +2,6 @@
 
 return [
     "Clear storage"                 =>  "Очистка хранилища",
-    "Connection name:"              =>  "Имя соединения:",
+    "Public folder on the web server"              =>  "Публичная папка веб сервера",
     
 ];

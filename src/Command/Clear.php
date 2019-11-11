@@ -26,6 +26,12 @@ class Clear extends AbstractCommand
                 $this->translator->translate('Clear storage')
             )
             ->addArgument(
+                'public_folder',
+                InputArgument::REQUIRED,
+                'Public folder on the web server',
+                null
+            )
+            ->addArgument(
                 'target',
                 InputArgument::REQUIRED,
                 'Clear all storage',
@@ -39,6 +45,8 @@ class Clear extends AbstractCommand
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         set_time_limit(0);
+        $public_folder        = $input->getArgument('public_folder');
+        $_SERVER['DOCUMENT_ROOT']=getcwd()."/".$public_folder;
         $this->storage->clearStorage();
     }
     
