@@ -1,6 +1,6 @@
 библиотека для работы с хранилищем файлов
 
-После установки следует загрузить в базу дамп из папки data, или использовать пакет composer require masterflash-ru/migration, и загрузить дамп.
+После установки следует загрузить в базу дамп из папки data, или использовать пакет masterflash-ru/migration, и загрузить дамп.
 
 Установка
 composer require masterflash-ru/storage
