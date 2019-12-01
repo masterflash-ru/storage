@@ -1,7 +1,7 @@
 <?php
 namespace Mf\Storage\Service\Factory;
 
-use Psr\Container\ContainerInterface;
+use Interop\Container\ContainerInterface;
 
 /*
 Фабрика 
