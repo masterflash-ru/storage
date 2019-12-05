@@ -19,7 +19,7 @@ class Version20191104163546 extends AbstractMigration implements MigrationInterf
         $table->addColumn(new Ddl\Column\Text('file_array',null,true,null,["COMMENT"=>"структура serialize массива имен файлов"]));
         $table->addColumn(new Ddl\Column\Floating('version',9,1,true,0,["COMMENT"=>"версия хранилища"]));
         $table->addConstraint(
-            new Ddl\Constraint\PrimaryKey(['id'])
+            new Ddl\Constraint\PrimaryKey(['id','razdel'])
         );
         $table->addConstraint(
             new Ddl\Index\Index(['todelete'])
