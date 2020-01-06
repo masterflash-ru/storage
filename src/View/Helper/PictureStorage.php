@@ -6,9 +6,9 @@
 
 namespace Mf\Storage\View\Helper;
 
-use Zend\View\Helper\AbstractHelper;
-use Zend\View\Helper\EscapeHtml;
-use Zend\View\Helper\EscapeHtmlAttr;
+use Laminas\View\Helper\AbstractHelper;
+use Laminas\View\Helper\EscapeHtml;
+use Laminas\View\Helper\EscapeHtmlAttr;
 
 
 /**

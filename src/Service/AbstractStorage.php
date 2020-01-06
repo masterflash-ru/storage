@@ -3,8 +3,8 @@ namespace Mf\Storage\Service;
 
 use Exception;
 use ADO\Service\RecordSet;
-use Zend\Validator\ValidatorChain;
-use Zend\Filter\FilterChain;
+use Laminas\Validator\ValidatorChain;
+use Laminas\Filter\FilterChain;
 
 /*
 сервис  хранения
