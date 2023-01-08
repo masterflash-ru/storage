@@ -12,8 +12,8 @@
     "prefer-stable": true,
     "require": {
         "php": "^7.2 || ^8.0",
-        "laminas/laminas-cache": "^2.7",
-        "masterflash-ru/ado": "^2.2"
+        "laminas/laminas-cache": "*",
+        "masterflash-ru/ado": "*"
     },
     "autoload": {
         "psr-4": {
